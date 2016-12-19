@@ -90,16 +90,16 @@ If (Test-Path -Path $FilePath) {
 	# Importing Policies
 	
 		# Get all the xml files in the FilePath (***not doing xml validation***)
-		Get-ChildItem $FilePath -Filter *.xml | 
+		$PolicyFiles = Get-ChildItem $FilePath -Filter *.xml
 
 		# Go through each xml
-		Foreach-Object {
+		Foreach ($PolicyFile in $PolicyFiles) {
+		
+			# Get the PolicyFile Path 
+			$PolicyFilePath = $PolicyFile.FullName
 
-		# Grab the filename
-		$PolicyFile = $_.FullName
-			
 			# Get the contents of the file
-			$xml = [xml](Get-Content $PolicyFile)
+			$xml = [xml](Get-Content $PolicyFilePath)
 
 			# Grab the name of the policy so it may be set properly in vCenter
 			$PolicyName = $xml.PbmCapabilityProfile.Name.'#text'
@@ -109,9 +109,6 @@ If (Test-Path -Path $FilePath) {
 			
 			Write-Host "$ACTIONTEXT $PolicyName from $FilePath to $Server" -foregroundcolor black -backgroundcolor green
 			Import-SpbmStoragePolicy  -Name $PolicyName -Description $PolicyDescription -FilePath $PolicyFile -ErrorAction SilentlyContinue
-			Write-Host 
-			
+			Write-Host 		
 		}
 	}
-	
-	
